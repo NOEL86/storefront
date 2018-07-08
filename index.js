@@ -15,7 +15,7 @@ var connection = mysql.createConnection({
 
     // Your password
     password: config.password,
-    database: "store_frontDB"
+    database: "bamazon_DB"
 });
 
 connection.connect(function (err) {
@@ -26,30 +26,35 @@ connection.connect(function (err) {
 });
 
 function selection() {
-    inquirer.prompt({
-        name: "selection",
-        type: "list",
-        message: "What would you like to do?",
-        choices: [
-            "Make an order",
-            "Find out how many are in stock",
-            "Find the item cost",
-            "Find the products sales total"
-        ]
-    })
+    inquirer
+        .prompt({
+            name: "selection",
+            type: "list",
+            message: "What would you like to do?",
+            choices: [
+                "Buy something",
+                "Find out how many are in stock",
+                "Find item cost",
+                "Find how many have been sold"
+            ]
+        })
         .then(function (res) {
 
             switch (res.selection) {
-                case "Make an order":
+                case "Buy something":
                     order();
+                    break;
+
+                case "Find item cost":
+                    cost();
                     break;
 
                 case "Find out how many are in stock":
                     stockNum();
                     break;
 
-                case "Find the products sales total":
-                    sales();
+                case "Find how many have been sold":
+                    salesTotal();
                     break;
 
                 default:
@@ -60,78 +65,122 @@ function selection() {
 }
 
 function order() {
-    inquirer.prompt([{
-        name: "department",
-        type: "input",
-        message: "What department is your item in?"
 
-    },
-    {
-        name: "item",
-        type: "input",
-        message: "What would you like to order?"
-
-    },
-    {
-        name: "number",
-        type: "input",
-        message: "How many would you like to order?"
-    }])
+    inquirer
+        .prompt([{
+            name: "item",
+            type: "list",
+            message: "What would you like to purchase?",
+            choices: [
+                "Pizza",
+                "Bread",
+                "Milk",
+                "Vacuum",
+                "Rug",
+                "Tires",
+                "Oil",
+                "Hat",
+                "Jeans",
+                "Shoes"
+            ]
+        },
+        {
+            name: "number",
+            type: "input",
+            message: "How many would you like to order?"
+        }])
         .then(function (res) {
+            if (err) throw err + "promise issue on ordering";
 
-            connection.query(
-                "INSERT INTO Inventory SET ?", {
-                    item_name: res.item,
-                    item_department: res.department,
-                    item_count: res.number
+            connection.query("SELECT item * FROM Products", function (err, res) {
+                if (err) throw err + "Not selected from Products Table";
 
-                },
-                function (err) {
-                    if (err) throw err + "Order not entered";
-                    console.log("Your order was accepted.");
-                    //need to decrement inventory by the number entered by user
-
+                if (res.number > item_count) {
+                    console.log("Sorry, we do not have enough units to complete your order request.");
                     selection();
-                }
-            )
 
+                } else {
+                    connection.query("UPDATE Products", function (err, res) {
+                        if (err) throw err + "not updating count";
+
+                        item_count = item_count - res.number;
+                        //need to decrement Products by the number entered by user
+                    })
+                    console.log("Your order was submitted successfully./nThank you!")
+
+                }
+            })
         })
 }
 
-function stockNum() {
-    var itemOrdered;
+
+function cost() {
 
     inquirer.prompt({
+
         name: "item",
-        type: "input",
-        message: "What item would you like to check on?",
-
-
+        type: "list",
+        message: "What item's price would you like to check?",
+        choices: [
+            "Pizza",
+            "Bread",
+            "Milk",
+            "Vacuum",
+            "Rug",
+            "Tires",
+            "Oil",
+            "Hat",
+            "Jeans",
+            "Shoes"
+        ]
     })
-        .then(function (res) {
+        .then(function (err) {
+            if (err) throw err + "cost function not working";
 
-            connection.query(
-                "UPDATE Inventory SET ? WHERE ?", [{
-                    item_count: res.number
-                },
-                {
-                    id: itemOrdered.id
-                }
-                ],
-                function (err) {
-                    if (err) throw err + "unable to calculate quantity";
-                    console.log("Currently: " + item_count + "in stock.");
-                    selection();
-                }
+            connection.query("SELECT item_cost * FROM Products", function (err, res) {
+                if (err) throw err + "Not selected from Products Table";
 
-            )
+                console.log(res.item_cost);
+
+
+            })
         })
-
-
 }
 
+// function stockNum() {
+// var itemOrdered;
 
-function sales() {
+// inquirer.prompt({
+//     name: "item",
+//     type: "input",
+//     message: "What item would you like to check on?",
+
+
+// })
+//     .then(function (res) {
+
+//         connection.query(
+//             "UPDATE Products SET ? WHERE ?", [{
+//                 item_count: 
+//                 }
+//                 {
+//                 id: itemOrdered.id
+//             },
+//             ]
+//                 function (err) {
+//                 if (err) throw err + "unable to calculate quantity";
+//                 console.log("Currently: " + item_count + "in stock.");
+//                 selection();
+//             }
+
+//         )
+//     })
+
+
+// }
+
+
+function salesTotal() {
     inquirer.prompt({
 
     })
