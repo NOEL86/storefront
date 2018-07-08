@@ -91,27 +91,26 @@ function order() {
         }])
         .then(function (res) {
             if (err) throw err + "promise issue on ordering";
+            var itemCount;
+            itemCount = item_count - res.number;
 
-            connection.query("SELECT item * FROM Products", function (err, res) {
-                if (err) throw err + "Not selected from Products Table";
+            if (res.number > itemCount) {
+                console.log("Sorry, we do not have enough units to complete your order request.");
+                selection();
+            } else {
+                connection.query(
+                    "UPDATE Products SET ?", {
+                        item_count: itemCount,
 
-                if (res.number > item_count) {
-                    console.log("Sorry, we do not have enough units to complete your order request.");
-                    selection();
-
-                } else {
-                    connection.query("UPDATE Products", function (err, res) {
-                        if (err) throw err + "not updating count";
-
-                        item_count = item_count - res.number;
                         //need to decrement Products by the number entered by user
                     })
-                    console.log("Your order was submitted successfully./nThank you!")
+                console.log(item_count);
+                console.log("Your order was submitted successfully./nThank you!")
 
-                }
-            })
+            }
         })
 }
+
 
 
 function cost() {
