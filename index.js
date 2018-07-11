@@ -20,12 +20,12 @@ var connection = mysql.createConnection({
 
 connection.connect(function (err) {
     if (err) throw err;
-    console.log("Connected");
-
+    console.log("connected as id " + connection.threadId);
     selection();
 });
 
 function selection() {
+
     inquirer
         .prompt({
             name: "selection",
@@ -59,6 +59,7 @@ function selection() {
 
                 default:
                     console.log("Thanks for making a selection.")
+
             }
         })
 
@@ -66,11 +67,89 @@ function selection() {
 
 function order() {
 
-    inquirer
-        .prompt([{
+    connection.query("SELECT * FROM Products", function (err, res) {
+        if (err) throw err;
+
+        inquirer
+            .prompt([{
+                name: "item",
+                type: "list",
+                message: "What would you like to purchase?",
+                choices: [
+                    "Pizza",
+                    "Bread",
+                    "Milk",
+                    "Vacuum",
+                    "Rug",
+                    "Tires",
+                    "Oil",
+                    "Hat",
+                    "Jeans",
+                    "Shoes"
+                ]
+            },
+            {
+                name: "number",
+                type: "input",
+                message: "How many would you like to order?",
+
+            }])
+            .then(function (answer) {
+                console.log(answer);
+                for (var i = 0; i < res.length; i++) {
+                    // console.log(res[i].id);
+                    // console.log(res[i].item_name);
+                    // console.log(res[i].item_quantity);
+                    itemCount = parseInt(res[i].item_quantity);
+
+                }
+
+                var item = answer.item;
+                var itemCount;
+                var itemsOrdered = parseInt(answer.number);
+                var itemsRemaining = itemCount - itemsOrdered;
+                console.log(answer.number + " " + item + " Selected for purchase.");
+                console.log(itemsRemaining + " Remaining in inventory.");
+
+
+                if (answer.number > itemsRemaining) {
+                    console.log("Sorry, we do not have enough units to complete your order request.");
+                    selection();
+                } else {
+                    connection.query(
+                        "UPDATE Products SET ? WHERE ?", [{
+
+                            item_quantity: itemsRemaining
+                            //need to decrement Products by the number entered by user
+                        },
+                        {
+                            item_name: item
+                        }
+                        ],
+                        function (err) {
+                            if (err) throw err;
+
+                            console.log("Your order was submitted successfully. Thank you!")
+                            console.log("=================================================")
+                            selection();
+                        }
+                    );
+                }
+
+            })
+    })
+}
+
+function cost() {
+
+    connection.query("SELECT * FROM Products", function (err, res) {
+        if (err) throw err;
+
+        inquirer.prompt({
+
             name: "item",
             type: "list",
-            message: "What would you like to purchase?",
+            message: "What item's price would you like to check?",
             choices: [
                 "Pizza",
                 "Bread",
@@ -83,67 +162,20 @@ function order() {
                 "Jeans",
                 "Shoes"
             ]
-        },
-        {
-            name: "number",
-            type: "input",
-            message: "How many would you like to order?"
-        }])
-        .then(function (res) {
-            if (err) throw err + "promise issue on ordering";
-            var itemCount;
-            itemCount = item_count - res.number;
-
-            if (res.number > itemCount) {
-                console.log("Sorry, we do not have enough units to complete your order request.");
-                selection();
-            } else {
-                connection.query(
-                    "UPDATE Products SET ?", {
-                        item_count: itemCount,
-
-                        //need to decrement Products by the number entered by user
-                    })
-                console.log(item_count);
-                console.log("Your order was submitted successfully./nThank you!")
-
-            }
         })
-}
+            .then(function (answer) {
 
-
-
-function cost() {
-
-    inquirer.prompt({
-
-        name: "item",
-        type: "list",
-        message: "What item's price would you like to check?",
-        choices: [
-            "Pizza",
-            "Bread",
-            "Milk",
-            "Vacuum",
-            "Rug",
-            "Tires",
-            "Oil",
-            "Hat",
-            "Jeans",
-            "Shoes"
-        ]
-    })
-        .then(function (err) {
-            if (err) throw err + "cost function not working";
-
-            connection.query("SELECT item_cost * FROM Products", function (err, res) {
-                if (err) throw err + "Not selected from Products Table";
-
-                console.log(res.item_cost);
-
+                connection.query("SELECT * FROM Products WHERE item_name=?", [answer.item], function (err, res) {
+                    if (err) throw err;
+                    for (var i = 0; i < res.length; i++) {
+                        console.log(res[i].item_name + " | " + "$" + res[i].item_cost);
+                    }
+                    selection();
+                })
 
             })
-        })
+
+    })
 }
 
 // function stockNum() {
