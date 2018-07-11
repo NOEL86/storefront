@@ -178,44 +178,18 @@ function cost() {
     })
 }
 
-// function stockNum() {
-// var itemOrdered;
+function stockNum() {
 
-// inquirer.prompt({
-//     name: "item",
-//     type: "input",
-//     message: "What item would you like to check on?",
+    connection.query(
+        "SELECT * FROM Products", function (err, res) {
+            if (err) throw err + "unable to calculate quantity";
 
+            for (var i = 0; i < res.length; i++) {
 
-// })
-//     .then(function (res) {
+                console.log(res[i].id + " | " + res[i].item_name + " | " + "Currently: " + res[i].item_quantity + " in stock.");
 
-//         connection.query(
-//             "UPDATE Products SET ? WHERE ?", [{
-//                 item_count: 
-//                 }
-//                 {
-//                 id: itemOrdered.id
-//             },
-//             ]
-//                 function (err) {
-//                 if (err) throw err + "unable to calculate quantity";
-//                 console.log("Currently: " + item_count + "in stock.");
-//                 selection();
-//             }
-
-//         )
-//     })
-
-
-// }
-
-
-function salesTotal() {
-    inquirer.prompt({
-
-    })
-        .then(function (res) {
-
+            }
+            selection();
         })
+
 }
