@@ -35,7 +35,6 @@ function selection() {
                 "Buy something",
                 "Find out how many are in stock",
                 "Find item cost",
-                "Find how many have been sold"
             ]
         })
         .then(function (res) {
@@ -51,10 +50,6 @@ function selection() {
 
                 case "Find out how many are in stock":
                     stockNum();
-                    break;
-
-                case "Find how many have been sold":
-                    salesTotal();
                     break;
 
                 default:
@@ -96,20 +91,17 @@ function order() {
             }])
             .then(function (answer) {
                 console.log(answer);
-                for (var i = 0; i < res.length; i++) {
-                    // console.log(res[i].id);
-                    // console.log(res[i].item_name);
-                    // console.log(res[i].item_quantity);
-                    itemCount = parseInt(res[i].item_quantity);
-                    total = parseInt(res[i].item_cost * itemsOrdered);
-
-                }
-                var total;
-                var item = answer.item;
                 var itemCount;
+                var total;
+                var itemsRemaining;
+                var item = answer.item;
                 var itemsOrdered = parseInt(answer.number);
 
-                var itemsRemaining = itemCount - itemsOrdered;
+                for (var i = 0; i < res.length; i++) {
+                    itemCount = +(res[i].item_quantity);
+                    itemsRemaining = itemCount - itemsOrdered;
+                    total = parseInt(+(res[i].item_cost) * itemsOrdered);
+                }
 
                 console.log(answer.number + " " + item + " Selected for purchase.");
                 console.log("$" + total);
