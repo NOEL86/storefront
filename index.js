@@ -101,14 +101,18 @@ function order() {
                     // console.log(res[i].item_name);
                     // console.log(res[i].item_quantity);
                     itemCount = parseInt(res[i].item_quantity);
+                    total = parseInt(res[i].item_cost * itemsOrdered);
 
                 }
-
+                var total;
                 var item = answer.item;
                 var itemCount;
                 var itemsOrdered = parseInt(answer.number);
+
                 var itemsRemaining = itemCount - itemsOrdered;
+
                 console.log(answer.number + " " + item + " Selected for purchase.");
+                console.log("$" + total);
                 console.log(itemsRemaining + " Remaining in inventory.");
 
 
