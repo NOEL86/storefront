@@ -34,7 +34,7 @@ function selection() {
             choices: [
                 "Buy something",
                 "Find out how many are in stock",
-                "Find item cost",
+                "Find item cost"
             ]
         })
         .then(function (res) {

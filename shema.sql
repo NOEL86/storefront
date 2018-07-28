@@ -12,7 +12,7 @@ CREATE TABLE Products
     item_department VARCHAR
     (50) NOT NULL,
     item_cost INT
-    (1000) NOT NULL,
+    (100) NOT NULL,
     item_quantity INT
     (100) NOT NULL,
     PRIMARY KEY
